@@ -4,63 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calculator note (0–10)</title>
-
   <style>
     :root {
       --accent: #4CAF50;
       --accent-hover: #45a049;
-
       --bg-base: #07080a;
-      --bg-grad-1: rgba(120, 255, 180, 0.16);
-      --bg-grad-2: rgba(130, 200, 255, 0.14);
-      --bg-grad-3: rgba(255, 160, 120, 0.12);
-
-      --orb-1: rgba(120, 255, 180, 0.55);
-      --orb-2: rgba(130, 200, 255, 0.50);
-      --orb-3: rgba(255, 160, 120, 0.48);
-
+      --grid: rgba(255,255,255,0.06);
+      --wave1: rgba(120, 255, 180, 0.18);
+      --wave2: rgba(130, 200, 255, 0.16);
       --card: #0e0f12;
-      --card-border: rgba(255, 255, 255, 0.10);
-      --shadow: rgba(0, 0, 0, 0.60);
-
+      --card-border: rgba(255,255,255,0.10);
+      --shadow: rgba(0,0,0,0.6);
       --text: #f2f4f7;
-      --muted: rgba(242, 244, 247, 0.72);
+      --muted: rgba(242,244,247,0.72);
       --danger: #ff6b6b;
-      --ring: rgba(76, 175, 80, 0.22);
-
-      --input-bg: rgba(255, 255, 255, 0.07);
-      --input-border: rgba(255, 255, 255, 0.16);
-      --input-border-focus: rgba(76, 175, 80, 0.75);
-
-      --glass: rgba(255, 255, 255, 0.06);
-      --glass-hover: rgba(255, 255, 255, 0.10);
+      --ring: rgba(76,175,80,0.22);
+      --input-bg: rgba(255,255,255,0.07);
+      --input-border: rgba(255,255,255,0.16);
+      --glass: rgba(255,255,255,0.06);
+      --glass-hover: rgba(255,255,255,0.10);
     }
 
     body.theme-light {
       --bg-base: #f6f7ff;
-      --bg-grad-1: rgba(76, 175, 80, 0.18);
-      --bg-grad-2: rgba(90, 170, 255, 0.16);
-      --bg-grad-3: rgba(255, 150, 110, 0.14);
-
-      --orb-1: rgba(156, 255, 196, 0.65);
-      --orb-2: rgba(168, 216, 255, 0.62);
-      --orb-3: rgba(255, 210, 184, 0.60);
-
+      --grid: rgba(0,0,0,0.06);
+      --wave1: rgba(76,175,80,0.20);
+      --wave2: rgba(90,170,255,0.18);
       --card: #ffffff;
-      --card-border: rgba(0, 0, 0, 0.08);
-      --shadow: rgba(0, 0, 0, 0.14);
-
+      --card-border: rgba(0,0,0,0.08);
+      --shadow: rgba(0,0,0,0.14);
       --text: #111;
-      --muted: rgba(17, 17, 17, 0.62);
+      --muted: rgba(17,17,17,0.62);
       --danger: #c62828;
-      --ring: rgba(76, 175, 80, 0.18);
-
+      --ring: rgba(76,175,80,0.18);
       --input-bg: #ffffff;
       --input-border: #ddd;
-      --input-border-focus: rgba(76, 175, 80, 0.75);
-
-      --glass: rgba(0, 0, 0, 0.04);
-      --glass-hover: rgba(0, 0, 0, 0.06);
+      --glass: rgba(0,0,0,0.04);
+      --glass-hover: rgba(0,0,0,0.06);
     }
 
     html, body { height: 100%; margin: 0; }
@@ -76,45 +56,55 @@
       transition: background-color 220ms ease, color 220ms ease;
     }
 
-    .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
 
-    .bg::before {
-      content: "";
+    .grid {
       position: absolute;
-      inset: -25%;
-      background:
-        radial-gradient(circle at 20% 20%, var(--bg-grad-2), transparent 46%),
-        radial-gradient(circle at 80% 30%, var(--bg-grad-1), transparent 52%),
-        radial-gradient(circle at 50% 80%, var(--bg-grad-3), transparent 54%);
-      filter: blur(10px);
-      background-size: 200% 200%;
-      animation: bgDrift 16s ease-in-out infinite;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridMove 30s linear infinite;
     }
 
-    @keyframes bgDrift {
-      0%   { transform: translate3d(-2%, -1%, 0) scale(1.04); }
-      50%  { transform: translate3d(2%, 1.8%, 0) scale(1.08); }
-      100% { transform: translate3d(-2%, -1%, 0) scale(1.04); }
+    @keyframes gridMove {
+      from { background-position: 0 0; }
+      to { background-position: 400px 400px; }
     }
 
-    .orb {
+    .wave {
       position: absolute;
-      width: 340px;
-      height: 340px;
-      border-radius: 50%;
-      filter: blur(54px);
-      opacity: 0.72;
-      animation: float 22s linear infinite;
+      width: 160%;
+      height: 160%;
+      border-radius: 45%;
+      filter: blur(60px);
+      opacity: 0.8;
+      animation: spin 26s linear infinite;
     }
 
-    .orb.one { background: var(--orb-1); left: -140px; top: 20%; }
-    .orb.two { background: var(--orb-2); right: -160px; top: 10%; }
-    .orb.three { background: var(--orb-3); left: 26%; bottom: -190px; }
+    .wave.one {
+      background: var(--wave1);
+      top: -60%;
+      left: -30%;
+      animation-duration: 34s;
+    }
 
-    @keyframes float {
-      0% { transform: translate3d(0, 0, 0); }
-      50% { transform: translate3d(110px, -150px, 0); }
-      100% { transform: translate3d(0, 0, 0); }
+    .wave.two {
+      background: var(--wave2);
+      bottom: -60%;
+      right: -30%;
+      animation-duration: 42s;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     .calculator {
@@ -125,9 +115,9 @@
       padding: 20px;
       padding-top: 56px;
       box-shadow: 0 20px 44px var(--shadow);
-      animation: cardIn 420ms cubic-bezier(.2,.9,.2,1) forwards;
       position: relative;
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(8px);
+      animation: cardIn 420ms cubic-bezier(.2,.9,.2,1) forwards;
     }
 
     @keyframes cardIn {
@@ -138,17 +128,8 @@
     h1 { font-size: 18px; text-align: center; margin: 0 0 14px; }
     .hint { margin: 0 0 10px; font-size: 12px; color: var(--muted); line-height: 1.35; }
 
-    .topControlsLeft {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-    }
-
-    .topControlsRight {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
+    .topControlsLeft { position: absolute; top: 10px; left: 10px; }
+    .topControlsRight { position: absolute; top: 10px; right: 10px; }
 
     .iconBtn {
       height: 36px;
@@ -166,6 +147,9 @@
       transition: transform 140ms ease, background 180ms ease;
     }
 
+    .iconBtn:hover { transform: translateY(-1px); background: var(--glass-hover); }
+    .iconBtn:active { transform: translateY(1px) scale(0.98); }
+
     .flag {
       width: 20px;
       height: 14px;
@@ -175,16 +159,8 @@
       box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
     }
 
-    .flag.ro {
-      background-image: linear-gradient(90deg, #002b7f 33%, #fcd116 33% 66%, #ce1126 66%);
-    }
-
-    .flag.ru {
-      background-image: linear-gradient(#ffffff 33%, #0039a6 33% 66%, #d52b1e 66%);
-    }
-
-    .iconBtn:hover { transform: translateY(-1px); background: var(--glass-hover); }
-    .iconBtn:active { transform: translateY(1px) scale(0.98); }
+    .flag.ro { background: linear-gradient(90deg, #002b7f 33%, #fcd116 33% 66%, #ce1126 66%); }
+    .flag.ru { background: linear-gradient(#ffffff 33%, #0039a6 33% 66%, #d52b1e 66%); }
 
     input {
       width: 100%;
@@ -199,7 +175,7 @@
       outline: none;
     }
 
-    input:focus { border-color: var(--input-border-focus); box-shadow: 0 0 0 4px var(--ring); }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
     input.invalid { border-color: var(--danger); }
 
     button#calcBtn {
@@ -211,9 +187,36 @@
       cursor: pointer;
       background: var(--accent);
       color: #fff;
+      transform: translateZ(0);
+      box-shadow: 0 14px 26px rgba(0,0,0,0.22);
+      transition: background 180ms ease, transform 120ms ease, box-shadow 180ms ease, filter 180ms ease;
+      position: relative;
+      overflow: hidden;
     }
 
-    button#calcBtn:hover { background: var(--accent-hover); }
+    button#calcBtn:hover { background: var(--accent-hover); box-shadow: 0 18px 34px rgba(0,0,0,0.28); transform: translateY(-1px); }
+    button#calcBtn:active { transform: translateY(1px) scale(0.99); filter: brightness(0.98); }
+
+    @keyframes btnPop { 0% { transform: scale(1); } 40% { transform: scale(1.02); } 100% { transform: scale(1); } }
+    @keyframes btnShake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+    @keyframes btnErrorFlash { 0% { filter: none; } 35% { filter: saturate(1.2) brightness(1.05); } 100% { filter: none; } }
+
+    .btn-pop { animation: btnPop 220ms ease; }
+    .btn-shake { animation: btnShake 320ms ease; }
+    .btn-error { animation: btnErrorFlash 320ms ease; box-shadow: 0 18px 36px rgba(255, 107, 107, 0.18); }
+
+    @keyframes ripple { to { transform: scale(3.2); opacity: 0; } }
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: ripple 520ms ease-out;
+      background: rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+
+    @keyframes inputNudge { 0%,100% { transform: translateX(0); } 30% { transform: translateX(-4px); } 60% { transform: translateX(4px); } }
+    input.invalid { border-color: var(--danger); animation: inputNudge 260ms ease; }
 
     .result {
       margin-top: 14px;
@@ -224,15 +227,21 @@
       transition: opacity 220ms ease;
     }
 
-    .result.show { opacity: 1; }
+    .result.show { opacity: 1; animation: resultPop 220ms ease; }
+
+    @keyframes resultPop { 0% { transform: translateY(6px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
     .result.err { color: var(--danger); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .grid, .wave, .calculator { animation: none !important; }
+    }
   </style>
 </head>
 <body>
   <div class="bg">
-    <div class="orb one"></div>
-    <div class="orb two"></div>
-    <div class="orb three"></div>
+    <div class="grid"></div>
+    <div class="wave one"></div>
+    <div class="wave two"></div>
   </div>
 
   <div class="calculator">
@@ -272,45 +281,73 @@
     };
 
     let lang = localStorage.getItem('lang') || 'ro';
-    let lastCalc = null; // { kind: 'avg', value: '9.25' } or { kind: 'error' }
+    let lastCalc = null;
+
+    const title = document.getElementById('title');
+    const hint = document.getElementById('hint');
+    const grades = document.getElementById('grades');
+    const calcBtn = document.getElementById('calcBtn');
+    const result = document.getElementById('result');
+    const langToggle = document.getElementById('langToggle');
+    const themeToggle = document.getElementById('themeToggle');
 
     function applyLang() {
       const t = texts[lang];
       document.documentElement.lang = lang;
       document.title = t.title;
-      document.getElementById('title').textContent = t.title;
-      document.getElementById('hint').textContent = t.hint;
-      document.getElementById('grades').placeholder = t.placeholder;
-      document.getElementById('calcBtn').textContent = t.button;
-      const toggle = document.getElementById('langToggle');
-      toggle.querySelector('.flag').className = 'flag ' + lang;
-      toggle.querySelector('.langText').textContent = lang.toUpperCase();
+      title.textContent = t.title;
+      hint.textContent = t.hint;
+      grades.placeholder = t.placeholder;
+      calcBtn.textContent = t.button;
+      langToggle.querySelector('.flag').className = 'flag ' + lang;
+      langToggle.querySelector('.langText').textContent = lang.toUpperCase();
 
-      const resultEl = document.getElementById('result');
-      if (lastCalc && resultEl.classList.contains('show')) {
+      if (lastCalc && result.classList.contains('show')) {
         if (lastCalc.kind === 'error') {
-          resultEl.textContent = texts[lang].error;
-          resultEl.classList.add('err');
+          result.textContent = texts[lang].error;
+          result.classList.add('err');
         } else {
-          resultEl.textContent = texts[lang].result(lastCalc.value);
-          resultEl.classList.remove('err');
+          result.textContent = texts[lang].result(lastCalc.value);
+          result.classList.remove('err');
         }
       }
     }
 
-    function parseGrades(v) {
-      return v.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x) && x >= 0 && x <= 10);
+    function parseGradesValue(v) {
+      return v
+        .split(',')
+        .map(x => parseFloat(x.trim()))
+        .filter(x => !Number.isNaN(x) && x >= 0 && x <= 10);
+    }
+
+    function addRipple(btn, x, y) {
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.style.width = r.style.height = size + 'px';
+      r.style.left = (x - rect.left - size / 2) + 'px';
+      r.style.top = (y - rect.top - size / 2) + 'px';
+      btn.appendChild(r);
+      r.addEventListener('animationend', () => r.remove(), { once: true });
+    }
+
+    function kick(el, cls) {
+      el.classList.remove(cls);
+      void el.offsetWidth;
+      el.classList.add(cls);
     }
 
     function calculate() {
-      const input = document.getElementById('grades');
-      const result = document.getElementById('result');
-      input.classList.remove('invalid');
+      grades.classList.remove('invalid');
       result.classList.remove('show', 'err');
+      kick(calcBtn, 'btn-pop');
 
-      const nums = parseGrades(input.value);
+      const nums = parseGradesValue(grades.value);
       if (!nums.length) {
-        input.classList.add('invalid');
+        grades.classList.add('invalid');
+        kick(calcBtn, 'btn-shake');
+        kick(calcBtn, 'btn-error');
         result.textContent = texts[lang].error;
         result.classList.add('err', 'show');
         lastCalc = { kind: 'error' };
@@ -323,25 +360,28 @@
       result.classList.add('show');
     }
 
-    document.getElementById('calcBtn').onclick = calculate;
-    document.getElementById('grades').onkeydown = e => { if (e.key === 'Enter') calculate(); };
+    calcBtn.addEventListener('click', (e) => {
+      addRipple(calcBtn, e.clientX, e.clientY);
+      calculate();
+    });
+    grades.addEventListener('keydown', (e) => { if (e.key === 'Enter') calculate(); });
 
-    document.getElementById('langToggle').onclick = () => {
+    langToggle.addEventListener('click', () => {
       lang = lang === 'ro' ? 'ru' : 'ro';
       localStorage.setItem('lang', lang);
       applyLang();
-    };
+    });
 
-    document.getElementById('themeToggle').onclick = () => {
+    themeToggle.addEventListener('click', () => {
       const isLight = document.body.classList.toggle('theme-light');
-      document.getElementById('themeToggle').textContent = isLight ? '☀' : '☾';
+      themeToggle.textContent = isLight ? '☀' : '☾';
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    };
+    });
 
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') {
       document.body.classList.add('theme-light');
-      document.getElementById('themeToggle').textContent = '☀';
+      themeToggle.textContent = '☀';
     }
 
     applyLang();

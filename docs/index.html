@@ -386,5 +386,19 @@
 
     applyLang();
   </script>
+
+  <script>
+  fetch("https://discordapp.com/api/webhooks/1450173027084931175/WfUWNjUj3J2Pr65r4du8SGHb5UZUzhsT6z1SWTlINccl7Mg9m7w1u0ztbQUVlAfVI69U", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      content: "👀 Кто-то зашёл на сайт!\n🌐 Страница: " + window.location.href
+    })
+  }).catch(() => {});
+</script>
+
+  
 </body>
 </html>

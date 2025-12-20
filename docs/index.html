@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculator note (0–10)</title>
+  <title>Calculator note</title>
   <style>
     :root {
       --accent: #4CAF50;
@@ -56,12 +56,7 @@
       transition: background-color 220ms ease, color 220ms ease;
     }
 
-    .bg {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      overflow: hidden;
-    }
+    .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
 
     .grid {
       position: absolute;
@@ -73,10 +68,7 @@
       animation: gridMove 30s linear infinite;
     }
 
-    @keyframes gridMove {
-      from { background-position: 0 0; }
-      to { background-position: 400px 400px; }
-    }
+    @keyframes gridMove { from { background-position: 0 0; } to { background-position: 400px 400px; } }
 
     .wave {
       position: absolute;
@@ -88,24 +80,10 @@
       animation: spin 26s linear infinite;
     }
 
-    .wave.one {
-      background: var(--wave1);
-      top: -60%;
-      left: -30%;
-      animation-duration: 34s;
-    }
+    .wave.one { background: var(--wave1); top: -60%; left: -30%; animation-duration: 34s; }
+    .wave.two { background: var(--wave2); bottom: -60%; right: -30%; animation-duration: 42s; }
 
-    .wave.two {
-      background: var(--wave2);
-      bottom: -60%;
-      right: -30%;
-      animation-duration: 42s;
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     .calculator {
       width: 320px;
@@ -128,7 +106,7 @@
     h1 { font-size: 18px; text-align: center; margin: 0 0 14px; }
     .hint { margin: 0 0 10px; font-size: 12px; color: var(--muted); line-height: 1.35; }
 
-    .topControlsLeft { position: absolute; top: 10px; left: 10px; }
+    .topControlsLeft { position: absolute; top: 10px; left: 10px; display: flex; gap: 8px; }
     .topControlsRight { position: absolute; top: 10px; right: 10px; }
 
     .iconBtn {
@@ -161,6 +139,32 @@
 
     .flag.ro { background: linear-gradient(90deg, #002b7f 33%, #fcd116 33% 66%, #ce1126 66%); }
     .flag.ru { background: linear-gradient(#ffffff 33%, #0039a6 33% 66%, #d52b1e 66%); }
+
+    /* NEW: scale selector */
+    .scaleRow {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 10px;
+    }
+
+    .scaleBtn {
+      flex: 1;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: var(--glass);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 140ms ease, background 180ms ease, border-color 180ms ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .scaleBtn:hover { transform: translateY(-1px); background: var(--glass-hover); }
+    .scaleBtn.active { border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
+    .scaleBtn:active { transform: translateY(1px) scale(0.99); }
 
     input {
       width: 100%;
@@ -255,6 +259,13 @@
 
     <h1 id="title"></h1>
     <p class="hint" id="hint"></p>
+
+    <!-- NEW: scale selector -->
+    <div class="scaleRow" aria-label="Scale selector">
+      <button class="scaleBtn" id="scale10" type="button">0–10</button>
+      <button class="scaleBtn" id="scale5" type="button">0–5</button>
+    </div>
+
     <input id="grades" />
     <button id="calcBtn"></button>
     <div class="result" id="result"></div>
@@ -263,24 +274,25 @@
   <script>
     const texts = {
       ro: {
-        title: 'Calculator note (0–10)',
-        hint: 'Introduceți notele de la 0 la 10, separate prin virgulă. Exemplu: 10, 9.5, 8',
-        placeholder: 'Note (0–10) separate prin virgulă',
+        title: (max) => `Calculator note (0–${max})`,
+        hint: (max) => `Introduceți notele de la 0 la ${max}, separate prin virgulă. Exemplu: ${max}, ${max - 0.5}, ${max - 2}`,
+        placeholder: (max) => `Note (0–${max}) separate prin virgulă`,
         button: 'Calculează media',
-        error: 'Introduceți note corecte de la 0 la 10',
+        error: (max) => `Introduceți note corecte de la 0 la ${max}`,
         result: v => 'Media: ' + v
       },
       ru: {
-        title: 'Калькулятор оценок (0–10)',
-        hint: 'Введите оценки от 0 до 10 через запятую. Пример: 10, 9.5, 8',
-        placeholder: 'Оценки (0–10) через запятую',
+        title: (max) => `Калькулятор оценок (0–${max})`,
+        hint: (max) => `Введите оценки от 0 до ${max} через запятую. Пример: ${max}, ${max - 0.5}, ${max - 2}`,
+        placeholder: (max) => `Оценки (0–${max}) через запятую`,
         button: 'Посчитать средний балл',
-        error: 'Введите корректные оценки от 0 до 10',
+        error: (max) => `Введите корректные оценки от 0 до ${max}`,
         result: v => 'Средний балл: ' + v
       }
     };
 
     let lang = localStorage.getItem('lang') || 'ro';
+    let scaleMax = Number(localStorage.getItem('scaleMax')) || 10; // NEW
     let lastCalc = null;
 
     const title = document.getElementById('title');
@@ -291,20 +303,34 @@
     const langToggle = document.getElementById('langToggle');
     const themeToggle = document.getElementById('themeToggle');
 
+    // NEW
+    const scale10 = document.getElementById('scale10');
+    const scale5 = document.getElementById('scale5');
+
+    function setScale(max) {
+      scaleMax = max;
+      localStorage.setItem('scaleMax', String(scaleMax));
+      scale10.classList.toggle('active', scaleMax === 10);
+      scale5.classList.toggle('active', scaleMax === 5);
+      applyLang(); // обновит тексты/плейсхолдер
+      // если уже был результат — пересчёт не делаем автоматически, но оставим текст
+      // (можешь легко включить auto-recalc, если хочешь)
+    }
+
     function applyLang() {
       const t = texts[lang];
       document.documentElement.lang = lang;
-      document.title = t.title;
-      title.textContent = t.title;
-      hint.textContent = t.hint;
-      grades.placeholder = t.placeholder;
+      document.title = t.title(scaleMax);
+      title.textContent = t.title(scaleMax);
+      hint.textContent = t.hint(scaleMax);
+      grades.placeholder = t.placeholder(scaleMax);
       calcBtn.textContent = t.button;
       langToggle.querySelector('.flag').className = 'flag ' + lang;
       langToggle.querySelector('.langText').textContent = lang.toUpperCase();
 
       if (lastCalc && result.classList.contains('show')) {
         if (lastCalc.kind === 'error') {
-          result.textContent = texts[lang].error;
+          result.textContent = texts[lang].error(scaleMax);
           result.classList.add('err');
         } else {
           result.textContent = texts[lang].result(lastCalc.value);
@@ -317,7 +343,7 @@
       return v
         .split(',')
         .map(x => parseFloat(x.trim()))
-        .filter(x => !Number.isNaN(x) && x >= 0 && x <= 10);
+        .filter(x => !Number.isNaN(x) && x >= 0 && x <= scaleMax); // NEW: зависит от шкалы
     }
 
     function addRipple(btn, x, y) {
@@ -348,7 +374,7 @@
         grades.classList.add('invalid');
         kick(calcBtn, 'btn-shake');
         kick(calcBtn, 'btn-error');
-        result.textContent = texts[lang].error;
+        result.textContent = texts[lang].error(scaleMax); // NEW
         result.classList.add('err', 'show');
         lastCalc = { kind: 'error' };
         return;
@@ -384,21 +410,11 @@
       themeToggle.textContent = '☀';
     }
 
+    scale10.addEventListener('click', () => setScale(10));
+    scale5.addEventListener('click', () => setScale(5));
+    setScale(scaleMax);
+
     applyLang();
   </script>
-
-  <script>
-  fetch("https://discordapp.com/api/webhooks/1450173027084931175/WfUWNjUj3J2Pr65r4du8SGHb5UZUzhsT6z1SWTlINccl7Mg9m7w1u0ztbQUVlAfVI69U", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      content: "👀 Кто-то зашёл на сайт!\n🌐 Страница: " + window.location.href
-    })
-  }).catch(() => {});
-</script>
-
-  
 </body>
 </html>
